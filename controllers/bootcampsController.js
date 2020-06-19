@@ -49,7 +49,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   const limit = parseInt(req.query.limit, 10) || 10; // default is 10 per page
   const startIndex = (page - 1) * limit; // to configure how many resources/bootcamps to skip;
   console.log(`the starting index amount is ${startIndex}`);
-  const endIndrx = page * limit;
+  const endIndex = page * limit;
   const total = await Bootcamp.countDocuments(); // mongo method...
 
   query = query.skip(startIndex).limit(limit);
