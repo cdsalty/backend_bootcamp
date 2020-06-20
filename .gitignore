@@ -1,9 +1,5 @@
 node_modules/
 config/config.env
-.notes.txt
+
 notes.txt
-./notes.txt
-notes
-.bootcampsControllerNotesVersion.js
-bootcampsControllerNotesVersion.js
-controllers/bootcampsControllerNotesVersion.js
+notes_review.txt

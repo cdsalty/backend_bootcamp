@@ -1,18 +1,19 @@
-const express = require("express");
-const dotenv = require("dotenv"); // see config file
-const morgan = require("morgan"); // for middleware
-const colors = require("colors");
-const errorHandler = require("./middleware/error");
-const connectDB = require("./config/db"); // this MUST be called after the config, before the routes
+const express = require('express');
+const dotenv = require('dotenv'); // see config file
+const morgan = require('morgan'); // for middleware
+const colors = require('colors');
+const errorHandler = require('./middleware/error');
+const connectDB = require('./config/db'); // this MUST be called after the config, before the routes
 
 // Load env variables
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({path: './config/config.env'});
 
 // Connect to Database
 connectDB();
 
 // Route Files
-const bootcamps = require("./routes/bootcamps");
+const bootcamps = require('./routes/bootcamps');
+const courses = require('./routes/courses');
 
 // initilize express
 const app = express();
@@ -21,31 +22,32 @@ const app = express();
 app.use(express.json());
 
 // Dev Logging MIDDLEWARE
-if (process.env.NODE_ENV === "development") {
-	app.use(morgan("dev"));
-	// EXAMPLE RETURN: DELETE /api/v1/bootcamps/1 200 2.564 ms - 46
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+  // EXAMPLE RETURN: DELETE /api/v1/bootcamps/1 200 2.564 ms - 46
 }
 
-// Mount routers to url
-app.use("/api/v1/bootcamps", bootcamps);
+// MOUNT ROUTERS to url
+app.use('/api/v1/bootcamps', bootcamps);
+app.use('/api/v1/courses', courses);
+
 // Inserting error-hanlder(for errs with next())
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(
-	PORT,
-	console.log(
-		`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow
-			.inverse
-	)
+  PORT,
+  console.log(
+    `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.inverse
+  )
 );
 
 // Handle UNHANDLED errors such as the server running but not connecting to database  ****
-process.on("unhandledRejection", (err, promise) => {
-	console.log(`Error: ${err.message}`.red.bold);
-	// Close Server, Exit Process and Detail Error in console
-	server.close(() => process.exit(1)); // WANT MORE CLARIFICATION FO OTHER OPTIONS
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`.red.bold);
+  // Close Server, Exit Process and Detail Error in console
+  server.close(() => process.exit(1)); // WANT MORE CLARIFICATION FO OTHER OPTIONS
 });
 
 // Example
