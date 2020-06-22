@@ -13,13 +13,13 @@ const Bootcamp = require('../models/Bootcamp'); // for crud functionality on Boo
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
   // console.log(req.query); // to see what the starting data looks like
   let query;
-  // Copy req.query
+  // Copy the req.query object
   const reqQuery = {...req.query}; // make copy of user's req.query
   // Fields to remove/exclude
   const removeFields = ['select', 'sort', 'page', 'limit'];
   // Loop over and delete removeFields from reqQuery
   removeFields.forEach((param) => delete reqQuery[param]);
-  console.log(reqQuery);
+  console.log(`The req.query is ${reqQuery}`);
 
   // Create query String
   let queryString = JSON.stringify(reqQuery); // in order to use .replace(), convert to string/array format
@@ -27,7 +27,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
   // Finding resource
-  query = Bootcamp.find(JSON.parse(queryString));
+  query = Bootcamp.find(JSON.parse(queryString)).populate('courses'); // updated with populate to show a JSON list of courses;
 
   // Select fields (this will only return the name and description of each bootcamp vs all information of the bootcamps that match. I can choose what to send back)
   if (req.query.select) {
