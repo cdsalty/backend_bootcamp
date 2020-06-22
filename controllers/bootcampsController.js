@@ -36,7 +36,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     query = query.select(fields);
   }
 
-  // SORT - (SortBy) such as name, createdAt, etc. (uses negative for descending order)
+  // SORT -------------- (SortBy) such as name, createdAt, etc. (uses negative for descending order)
   if (req.query.sort) {
     const sortBy = req.query.sort.split(',').join(' ');
     query = query.sort(sortBy);
@@ -44,7 +44,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     query = query.sort('-createdAt');
   }
 
-  // PAGINATION
+  // PAGINATION ------------------------------------
   const page = parseInt(req.query.page, 10) || 1; // ignoring page and assigning the value as an integer; default page 1;
   const limit = parseInt(req.query.limit, 10) || 10; // default is 10 per page
   const startIndex = (page - 1) * limit; // to configure how many resources/bootcamps to skip;
