@@ -11,32 +11,30 @@ const Bootcamp = require('../models/Bootcamp'); // for crud functionality on Boo
 // @ACCESS?         PUBLIC
 /// WHAT? This will get all bootcamps along with average cost and other filtering options, location.city=Boston, careers[in]=business
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  // console.log(req.query); // to see what the starting data looks like
+  // console.log(req.query);
   let query;
-  // Copy the req.query object
-  const reqQuery = {...req.query}; // make copy of user's req.query
-  // Fields to remove/exclude
-  const removeFields = ['select', 'sort', 'page', 'limit'];
-  // Loop over and delete removeFields from reqQuery
-  removeFields.forEach((param) => delete reqQuery[param]);
-  console.log(`The req.query is ${reqQuery}`);
+  const reqQuery = {...req.query}; // make copy of the req.query object
+  const removeFields = ['select', 'sort', 'page', 'limit']; // fields that will be excluded and removed from the params
+  removeFields.forEach((param) => delete reqQuery[param]); // Loop over and DELETE REMOVEFIELDS FROM reqQuery.
+  // console.log(`The req.query is ${reqQuery}`);
 
-  // Create query String
-  let queryString = JSON.stringify(reqQuery); // in order to use .replace(), convert to string/array format
+  // For Money Operater to display
+  // Convert reqQuery to string in order to use the replace method.
+  let queryString = JSON.stringify(reqQuery);
   // Create operators($gt, $gte, $in, etc.)
   queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
-  // Finding resource
-  query = Bootcamp.find(JSON.parse(queryString)).populate('courses'); // updated with populate to show a JSON list of courses;
+  // Finding resource (in regards to the virtual created inside of courses to show name and description)
+  query = Bootcamp.find(JSON.parse(queryString)).populate('courses'); // could pass in an object to limit the fields displayed as done insided the coursesController
 
-  // Select fields (this will only return the name and description of each bootcamp vs all information of the bootcamps that match. I can choose what to send back)
+  // Select fields (this will only return the name and description of each bootcamp vs all information of the bootcamps that match.)
   if (req.query.select) {
     const fields = req.query.select.split(',').join(' ');
     // console.log(fields);
     query = query.select(fields);
   }
 
-  // SORT -------------- (SortBy) such as name, createdAt, etc. (uses negative for descending order)
+  // SORT (use negative number to sort by descending order) ------------------------------------
   if (req.query.sort) {
     const sortBy = req.query.sort.split(',').join(' ');
     query = query.sort(sortBy);
@@ -48,7 +46,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page, 10) || 1; // ignoring page and assigning the value as an integer; default page 1;
   const limit = parseInt(req.query.limit, 10) || 10; // default is 10 per page
   const startIndex = (page - 1) * limit; // to configure how many resources/bootcamps to skip;
-  console.log(`the starting index amount is ${startIndex}`);
+  // console.log(`the starting index amount is ${startIndex}`);
   const endIndex = page * limit;
   const total = await Bootcamp.countDocuments(); // mongo method...
 
@@ -143,12 +141,17 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @ROUTE           DELETE /api/v1/bootcamps/:id
 // @ACCESS?         ** PRIVATE (will have to setup a token)
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  // in order to pass the mongoose middleware, must use 'findById' and then check it and THEN you can call the remove method created from the pre(middleware)
+  // const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
   if (!bootcamp) {
     return next(
       new ErrorResponse(`Bootcamp not found with the id of ${req.params.id}`, 404)
     );
   }
+
+  bootcamp.remove(); // the remove is being triggered from the 'remove' called in the pre method before saving; inside Bootcamp.js
+
   res.status(200).json({
     sucess: true,
     data: {},

@@ -124,6 +124,7 @@ const BootcampSchema = new mongoose.Schema(
       default: Date.now
     }
   },
+  //add virtuals to show name and description inside the JSON returned
   {
     toJSON: {virtuals: true},
     toObject: {virtuals: true}
@@ -146,8 +147,7 @@ BootcampSchema.pre('save', async function(next) {
   this.location = {
     // coming from the schema defined up top because of enum value
     type: 'Point',
-    // (NOTE) gets longitude first instead of lat
-    coordinates: [loc[0].longitude, loc[0].latitude],
+    coordinates: [loc[0].longitude, loc[0].latitude], // (NOTE) gets longitude first instead of lat
     formattedAddress: loc[0].formattedAddress,
     street: loc[0].streetName,
     city: loc[0].city,
@@ -157,14 +157,21 @@ BootcampSchema.pre('save', async function(next) {
   };
 
   // Do not save the address as a variable in DB instead using it to pull from this.location; 'formattedAddress' does this
-  this.address = undefined; // **** NOTE TO SELF TO REMEMBER   ***** the address being typed in as one entire string from user
+  this.address = undefined; // **** NOTE TO SELF: MUST REMEMBER   ***** the address being typed in as one entire string from user
 });
 
-// REVERSE POPULATE with VIRTUALS
+// Cascade delete (When a bootcamp is removed from the database, remove the courses that were from that specific bootcamp):
+BootcampSchema.pre('remove', async function(next) {
+  console.log(`Courses being deleted from the bootcamp are: ${this._id}`);
+  await this.model('Course').deleteMany({bootcamp: this._id}); // in the Course model, the type is an ObjectId; deleteMany is mongoose method. reference the bootcamp to delete.
+  next();
+});
+
+// REVERSE POPULATE with VIRTUALS (courses, in this context will be the starting JSON value that will hold name and description.)
 BootcampSchema.virtual('courses', {
-  // courses can be called whatever makes sense
+  // courses can be called whatever makes sense (this will be the starting JSON value returned)
   ref: 'Course', // what model to reference too
-  localField: '_id',
+  localField: '_id', // the object id
   foreignField: 'bootcamp', // the field in the Course model you want to pertain to
   justOne: false // want array of courses listed when
 });
