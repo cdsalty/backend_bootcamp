@@ -6,7 +6,7 @@ const Course = require('../models/Course');
 // @ROUTE           GET /api/v1/courses
 // @ROUTE           GET /api/v1/bootcamps/:bootcampId/courses
 // @ACCESS?         PUBLIC
-// initialize a query variable; test to see if bootcampId exist;
+// initialize a query variable; test if bootcampId exist;
 //    `-->if it does, display specific courses and if not, display all courses
 // populate: will populate all the data or the exact data you want inside the JSON return call
 exports.getCourses = asyncHandler(async (req, res, next) => {
@@ -29,6 +29,25 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
     success: true,
     count: courses.length,
     data: courses
+  });
+});
+
+// @DESCRIPTION     Get a single COURSE
+// @ROUTE           GET /api/v1/courses/:id
+// @ACCESS          PUBLIC
+exports.getCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id).populate({
+    path: 'bootcamp',
+    select: 'name description'
+  });
+  // Always verify what your searching for is actually there.
+  if (!course) {
+    return next(new ErrorResponse(`no course with id of ${req.params.id} exist`), 404);
+  }
+
+  res.status(200).json({
+    success: true,
+    data: course
   });
 });
 

@@ -160,7 +160,7 @@ BootcampSchema.pre('save', async function(next) {
   this.address = undefined; // **** NOTE TO SELF: MUST REMEMBER   ***** the address being typed in as one entire string from user
 });
 
-// Cascade delete (When a bootcamp is removed from the database, remove the courses that were from that specific bootcamp):
+// 39. Cascade delete (When a bootcamp is removed from the database, remove the courses that were from that specific bootcamp):
 BootcampSchema.pre('remove', async function(next) {
   console.log(`Courses being deleted from the bootcamp are: ${this._id}`);
   await this.model('Course').deleteMany({bootcamp: this._id}); // in the Course model, the type is an ObjectId; deleteMany is mongoose method. reference the bootcamp to delete.
