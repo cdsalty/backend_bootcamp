@@ -34,7 +34,7 @@ const CourseSchema = new mongoose.Schema({
   },
   // need to add bootcamp as field for it to be relational
   bootcamp: {
-    type: mongoose.Schema.ObjectId, // this assist me in passing along the objectId that's already been assisgned
+    type: mongoose.Schema.ObjectId, // this assist in passing the objectId that's already been assisgned
     ref: 'Bootcamp',
     required: true
   }

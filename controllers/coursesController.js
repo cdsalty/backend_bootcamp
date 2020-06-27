@@ -1,6 +1,7 @@
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Course = require('../models/Course');
+const Bootcamp = require('../models/Bootcamp');
 
 // @DESCRIPTION     Get all COURSES or COURSES WITHIN A SPECIFIC BOOTCAMP
 // @ROUTE           GET /api/v1/courses
@@ -44,6 +45,33 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
   if (!course) {
     return next(new ErrorResponse(`no course with id of ${req.params.id} exist`), 404);
   }
+
+  res.status(200).json({
+    success: true,
+    data: course
+  });
+});
+
+// @DESCRIPTION     ADD COURSE
+// @ROUTE           GET /api/v1/bootcamps/:bootcampId/courses
+// since a course is associated by bootcamps, the bootcampId is needed; will use resource controller
+// @ACCESS          PRIVATE
+exports.addCourse = asyncHandler(async (req, res, next) => {
+  // needs to be submitted IN THE BODY field because in course model, bootcamp is a field. assign to body
+  req.body.bootcamp = req.params.bootcampId; // to get the id submitted inside the bootcamp field
+  // ** REVIEW this above
+
+  // get bootcamp
+  const bootcamp = await Bootcamp.findById(req.params.bootcampId);
+  // Always verify what your searching for is actually there.
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(`no bootcamp with id of ${req.params.bootcampId} exist`),
+      404
+    );
+  }
+  // after getting bootcamp, CREATE NEW COURSE  (req.body: anything from body, the bootcamp)
+  const course = await Course.create(req.body);
 
   res.status(200).json({
     success: true,
