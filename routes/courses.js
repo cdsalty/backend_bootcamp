@@ -1,12 +1,20 @@
-const express = require('express');
-const {getCourses, getCourse, addCourse} = require('../controllers/coursesController');
+const express = require("express");
+const {
+	getCourses,
+	getCourse,
+	addCourse,
+	updateCourse
+} = require("../controllers/coursesController");
 
 const router = express.Router({mergeParams: true}); // to merge bootcampsId within courses
 
 router
-  .route('/')
-  .get(getCourses)
-  .post(addCourse);
-router.route('/:id').get(getCourse);
+	.route("/")
+	.get(getCourses)
+	.post(addCourse);
+router
+	.route("/:id")
+	.get(getCourse)
+	.put(updateCourse);
 
 module.exports = router;
