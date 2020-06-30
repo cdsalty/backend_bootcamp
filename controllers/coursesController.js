@@ -86,7 +86,7 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
 // -----------------------------------------------------------------------------------------
 
 // @DESCRIPTION     UPDATE COURSE
-// @ROUTE           GET /api/v1/courses/:id
+// @ROUTE           PUT /api/v1/courses/:id
 // @ACCESS          PRIVATE
 exports.updateCourse = asyncHandler(async (req, res, next) => {
 	// get the course
@@ -100,18 +100,28 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
 		new: true,
 		runValidators: true
 	});
-	// to test, creatd json and ran a put request on the courses/5d725c84c4ded7bcb480eaa0
-	/*
-  in postman, put request using raw format and then made th call the to the courses/id route: 
-  {
-    "tuition": 13000,
-    "minimumSkill": "advanced"
-  }
-  */
-
 	res.status(200).json({
 		success: true,
 		data: course
+	});
+});
+
+// @DESCRIPTION     DELETE COURSE
+// @ROUTE           DELETE /api/v1/courses/:id
+// @ACCESS          PRIVATE
+exports.deleteCourse = asyncHandler(async (req, res, next) => {
+	// get the course
+	const course = await Course.findById(req.params.id);
+	// verify the course is there
+	if (!course) {
+		return next(new ErrorResponse(`no course with id of ${req.params.id} exist`), 404);
+	}
+	// REMOVE the course:
+	await course.remove();
+
+	res.status(200).json({
+		success: true,
+		data: {} // returning empty object
 	});
 });
 
@@ -130,4 +140,15 @@ By creating a virtual field, I was able to produce this information INSIDE get a
     "createdAt": "2020-06-19T05:08:54.930Z",
     "__v": 0
   },
+
+
+  TO TEST MY UPDATE:
+  	// to test, creatd json and ran a put request on the courses/5d725c84c4ded7bcb480eaa0
+
+  in postman, put request using raw format and then made th call the to the courses/id route: 
+  {
+    "tuition": 13000,
+    "minimumSkill": "advanced"
+  }
+  
 */

@@ -3,7 +3,8 @@ const {
 	getCourses,
 	getCourse,
 	addCourse,
-	updateCourse
+	updateCourse,
+	deleteCourse
 } = require("../controllers/coursesController");
 
 const router = express.Router({mergeParams: true}); // to merge bootcampsId within courses
@@ -15,6 +16,7 @@ router
 router
 	.route("/:id")
 	.get(getCourse)
-	.put(updateCourse);
+	.put(updateCourse)
+	.delete(deleteCourse);
 
 module.exports = router;
