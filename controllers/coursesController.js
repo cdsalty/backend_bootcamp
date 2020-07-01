@@ -3,6 +3,8 @@ const asyncHandler = require("../middleware/async");
 const Course = require("../models/Course");
 const Bootcamp = require("../models/Bootcamp");
 
+// -----------------------------------------------------------------------------------------
+
 // @DESCRIPTION     Get all COURSES or COURSES WITHIN A SPECIFIC BOOTCAMP
 // @ROUTE           GET /api/v1/courses
 // @ROUTE           GET /api/v1/bootcamps/:bootcampId/courses
@@ -57,7 +59,7 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // -----------------------------------------------------------------------------------------
 
 // @DESCRIPTION     ADD COURSE
-// @ROUTE           GET /api/v1/bootcamps/:bootcampId/courses
+// @ROUTE           POST /api/v1/bootcamps/:bootcampId/courses
 // since a course is associated by bootcamps, the bootcampId is needed; make use resource controller
 // @ACCESS          PRIVATE
 exports.addCourse = asyncHandler(async (req, res, next) => {
@@ -106,6 +108,8 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
 	});
 });
 
+// -----------------------------------------------------------------------------------------
+
 // @DESCRIPTION     DELETE COURSE
 // @ROUTE           DELETE /api/v1/courses/:id
 // @ACCESS          PRIVATE
@@ -124,6 +128,8 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
 		data: {} // returning empty object
 	});
 });
+
+// -----------------------------------------------------------------------------------------
 
 /*
 By creating a virtual field, I was able to produce this information INSIDE get all bootcamps
