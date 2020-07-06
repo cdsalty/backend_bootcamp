@@ -1,3 +1,4 @@
+const path = require("path");
 const ErrorResponse = require("../utils/errorResponse");
 const geocoder = require("../utils/geocoder");
 const asyncHandler = require("../middleware/async");
@@ -208,13 +209,30 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
 	if (!req.files) {
 		return next(new ErrorResponse(`Please UPLOAD a file`, 404));
 	}
+	// verify the image is photo (vs. text document, etc., using the mime type that is sent back from req.files.file)
 	console.log(req.files.file);
-	// verify the image is photo (vs. text document, etc., using the mime type that is sent back from the data uploaded with a photo)
+
+	// FILE REPRESENTS THE PHOTO-DATA COMING BACK FROM PHOTO
+	const file = req.files.file;
+
 	if (!file.mimetype.startsWith("image")) {
+		// if the mimetype does not start with image,
 		return next(new ErrorResponse("Please upload an image file"), 404);
 	}
 
-	// Check File Size: data referenced in .env
+	// Check File Size: (data referenced in .env)
+	if (file.size > process.env.MAX_FILE_UPLOAD) {
+		return new ErrorResponse(
+			`Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`
+		);
+	}
+
+	// Create Custom File Name that will save each photo with a unique file name: (prevent over-written)
+	file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+	// example of return data: photo_5d725a1b7b292f5f8ceff788
+
+	console.log(file.name);
+	// To save the file, make use of the 'mv' method that is returned from req.files.file. This will move it to the directory I choose.
 
 	// res.status(200).json({
 	// 	sucess: true,
