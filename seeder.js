@@ -32,7 +32,7 @@ const importData = async () => {
 	try {
 		// don't need to save as variable because not responding with anything; just importing to database
 		await Bootcamp.create(bootcamps);
-		// await Course.create(courses); // Step 3  (temporily removed, bootcamps only with no avg cost in seeder)
+		await Course.create(courses); // Step 3  (temporily removed, bootcamps only with no avg cost in seeder)
 		console.log("Data imported...".green.inverse);
 		process.exit();
 	} catch (err) {

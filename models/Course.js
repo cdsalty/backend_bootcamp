@@ -44,8 +44,7 @@ const CourseSchema = new mongoose.Schema({
 // Static Method to get average of course tuitions (the goal being to create a new object with id and average cost)
 CourseSchema.statics.getAverageCost = async function(bootcampId) {
 	// pass in bootcampId in order to know what bootcamp to work with
-	console.log("Calculating average cost...".blue);
-
+	// console.log("Calculating average cost...".blue);
 	// Do the Aggregations (this.aggregate returns a promise so use await)
 	const obj = await this.aggregate([
 		// THIS IS THE PIPELINE (each pipeline will have different steps/operators)
