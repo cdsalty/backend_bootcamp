@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv"); // see config file
 const morgan = require("morgan"); // for middleware
@@ -27,8 +28,12 @@ if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 }
 
-// File uploading Middleware (for express-fileupload)
+// File uploading (Middleware for express-fileupload)
 app.use(fileupload());
+
+// Set static folder for uploading images (this will require the path module as well)
+app.use(express.static(path.join(__dirname, "public")));
+// join is used for coming things together
 
 // MOUNT ROUTERS to url
 app.use("/api/v1/bootcamps", bootcamps);

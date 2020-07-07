@@ -210,10 +210,9 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`Please UPLOAD a file`, 404));
 	}
 	// verify the image is photo (vs. text document, etc., using the mime type that is sent back from req.files.file)
-	console.log(req.files.file);
+	// console.log(req.files.file);
 
-	// FILE REPRESENTS THE PHOTO-DATA COMING BACK FROM PHOTO
-	const file = req.files.file;
+	const file = req.files.file; // file represents the data that comes back from the photo
 
 	if (!file.mimetype.startsWith("image")) {
 		// if the mimetype does not start with image,
@@ -227,21 +226,30 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
 		);
 	}
 
-	// Create Custom File Name that will save each photo with a unique file name: (prevent over-written)
+	// Create Custom File Name (to save each photo with a unique file name: (the goal: prevent over-writting any files with the same name))
 	file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
-	// example of return data: photo_5d725a1b7b292f5f8ceff788
+	// example of the data returned: photo_5d725a1b7b292f5f8ceff788; by using .ext we are able to get the extension such as jpg
+	// console.log(file.name);
+	// To save and move the file to custom directory: the file, make use of the 'mv' method that is returned from req.files.file.
+	file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+		if (err) {
+			console.log(err);
+			return next(new ErrorResponse(`There is a problem with the file upload`, 504));
+		}
+		await Bootcamp.findByIdAndUpdate(req.params.id, {photo: file.name}); // get the info, and with the photo data, give it the photo/file name
 
-	console.log(file.name);
-	// To save the file, make use of the 'mv' method that is returned from req.files.file. This will move it to the directory I choose.
-
-	// res.status(200).json({
-	// 	sucess: true,
-	// 	data: {},
-	// 	fyi: "Bootcamp was deleted"
-	// });
+		res.status(200).json({
+			sucess: true,
+			data: file.name,
+			fyi: "The photo upload was a success"
+		});
+	});
 });
 
+// End of file
+
 // ------------------------------------------------------------------------------------------------------------
+
 // END OF FILE;
 
 /*
