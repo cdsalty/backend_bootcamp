@@ -13,69 +13,9 @@ const Bootcamp = require("../models/Bootcamp"); // for crud functionality on Boo
 /// WHAT? This will get all bootcamps along with average cost and other filtering options, location.city=Boston, careers[in]=business
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
 	// console.log(req.query);
-	let query;
-	const reqQuery = {...req.query}; // make copy of the req.query object
-	const removeFields = ["select", "sort", "page", "limit"]; // fields that will be excluded and removed from the params
-	removeFields.forEach((param) => delete reqQuery[param]); // Loop over and DELETE REMOVEFIELDS FROM reqQuery.
-	// console.log(`The req.query is ${reqQuery}`);
 
-	// For Money Operater to display
-	// Convert reqQuery to string in order to use the replace method.
-	let queryString = JSON.stringify(reqQuery);
-	// Create operators($gt, $gte, $in, etc.)
-	queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
-
-	// Finding resource (in regards to the virtual created inside of courses to show name and description)
-	query = Bootcamp.find(JSON.parse(queryString)).populate("courses"); // could pass in an object to limit the fields displayed as done insided the coursesController
-
-	// Select fields (this will only return the name and description of each bootcamp vs all information of the bootcamps that match.)
-	if (req.query.select) {
-		const fields = req.query.select.split(",").join(" ");
-		// console.log(fields);
-		query = query.select(fields);
-	}
-
-	// SORT (use negative number to sort by descending order) ------------------------------------
-	if (req.query.sort) {
-		const sortBy = req.query.sort.split(",").join(" ");
-		query = query.sort(sortBy);
-	} else {
-		query = query.sort("-createdAt");
-	}
-
-	// PAGINATION ------------------------------------
-	const page = parseInt(req.query.page, 10) || 1; // ignoring page and assigning the value as an integer; default page 1;
-	const limit = parseInt(req.query.limit, 10) || 10; // default is 10 per page
-	const startIndex = (page - 1) * limit; // to configure how many resources/bootcamps to skip;
-	// console.log(`the starting index amount is ${startIndex}`);
-	const endIndex = page * limit;
-	const total = await Bootcamp.countDocuments(); // mongo method...
-
-	query = query.skip(startIndex).limit(limit);
-
-	// Execute the query
-	const bootcamps = await query;
-
-	// Pagination Results
-	const pagination = {}; // pagination object
-
-	if (endIndex < total) {
-		pagination.next = {
-			page: page + 1,
-			limit: limit
-		};
-	}
-
-	if (startIndex > 0) {
-		pagination.prev = {
-			page: page - 1,
-			limit
-		};
-	}
-
-	res
-		.status(200)
-		.json({sucess: true, count: bootcamps.length, pagination, data: bootcamps});
+	res.status(200).json(res.advancedResults); // have access becuase this route/method is using the middleware
+	// .json({sucess: true, count: bootcamps.length, pagination, data: bootcamps});
 });
 
 // ------------------------------------------------------------------------------------------------------------------------------------------

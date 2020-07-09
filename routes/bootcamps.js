@@ -10,6 +10,12 @@ const {
 	bootcampPhotoUpload
 } = require("../controllers/bootcampsController");
 
+// bringing in model
+const Bootcamp = require("../models/Bootcamp");
+
+// bringing in middleware (will give access to 'res.advancedResults' which is what I send back to the client)
+const advancedResults = require("../middleware/advancedResults");
+
 // resourceRouter#1: To include other resource routers (goal behind the scenes is to be able to use this route with my courses)
 const courseRouter = require("./courses");
 
@@ -26,7 +32,8 @@ router.route("/:id/photo").put(bootcampPhotoUpload);
 
 router
 	.route("/")
-	.get(getBootcamps)
+	// .get(getBootcamps)
+	.get(advancedResults(Bootcamp, "courses"), getBootcamps) // advancedResults takes in the 'model' and what to 'populate'
 	.post(createBootcamp);
 
 router
