@@ -13,26 +13,21 @@ const Bootcamp = require("../models/Bootcamp");
 //    `-->if it does, display specific courses and if not, display all courses
 // populate: will populate all the data or the exact data you want inside the JSON return call
 exports.getCourses = asyncHandler(async (req, res, next) => {
-	let query;
+	// let query; no longer needed
+	// this will show every course in the system along with information such as what school, etc.
 	if (req.params.bootcampId) {
-		query = Course.find({
+		const courses = await Course.find({
 			bootcamp: req.params.bootcampId
 		});
-	} else {
-		// else... return Courses
-		// query = Course.find().populate('bootcamp'); // too much data
-		query = Course.find().populate({
-			path: "bootcamp", // show the bootcamp data
-			select: "name description" // BUT ONLY NAME & DESCRIPTION
+		// *! This is just for a speficic bootcamp !*
+		return res.status(200).json({
+			success: true,
+			count: courses.length,
+			data: courses
 		});
+	} else {
+		res.status(200).json(res.advancedResults); // this will give all the results access to the pagination, selecting and searching with filters, etc.
 	}
-	const courses = await query;
-
-	res.status(200).json({
-		success: true,
-		count: courses.length,
-		data: courses
-	});
 });
 
 // -----------------------------------------------------------------------------------------
