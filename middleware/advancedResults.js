@@ -1,4 +1,4 @@
-// 'function inside/within a function'
+// 'function inside/within a function' that allows the functionality to be resusable.
 const advancedResults = (model, populate) => async (req, res, next) => {
 	// pasted from bootcampsController and then changed accordingly.
 	let query;
