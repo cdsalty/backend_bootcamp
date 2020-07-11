@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema({
 	name: {
@@ -38,6 +39,13 @@ UserSchema.pre("save", async function(next) {
 	this.password = await bcrypt.hash(this.password, salt); // pulled out password in authController.js
 });
 
-// Sign JWT and Return: (https://jwt.io/)
+// Sign JWT and Return: (https://jwt.io/)	(Sign it and pass it the payload)	(will be called in controller)
+// let token = jwt.sign({PAYLOAD}, 'password', any options)	// https://github.com/auth0/node-jsonwebtoken
+UserSchema.methods.getSignedJwtToken = function() {
+	// by using a method instead 'static', it's being called directly on this user/id
+	return jwt.sign({id: this._id}, process.env.JWT_SECRET, {
+		expiresIn: process.env.JWT_EXPIRE
+	});
+};
 
 module.exports = mongoose.model("User", UserSchema); // the model be will be called User
