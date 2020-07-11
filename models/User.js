@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema({
 	name: {
@@ -29,5 +30,14 @@ const UserSchema = new mongoose.Schema({
 		default: Date.now
 	}
 });
+
+// Encrypt Passwords with BCRYPTjs
+UserSchema.pre("save", async function(next) {
+	// generate a 'salt' to hash the password(genSalt() is a bcrypt method that returns a promise; higher number 	is more secure; recommended is 10)
+	const salt = await bcrypt.genSalt(10);
+	this.password = await bcrypt.hash(this.password, salt); // pulled out password in authController.js
+});
+
+// Sign JWT and Return: (https://jwt.io/)
 
 module.exports = mongoose.model("User", UserSchema); // the model be will be called User
