@@ -19,8 +19,9 @@ exports.register = asyncHandler(async (req, res, next) => {
 	});
 
 	// Create TOKEN
-	const token = user.getSignedJwtToken();
-	res.status(200).json({success: true, token: token});
+	// const token = user.getSignedJwtToken();
+	// res.status(200).json({success: true, token: token});
+	sendTokenResponse(user, 200, res); // updated with helper function
 });
 
 // @DESCRIPTION     * LOGIN User*
@@ -38,19 +39,41 @@ exports.login = asyncHandler(async (req, res, next) => {
 	if (!user) {
 		return next(new ErrorResponse("Invalid User Credientials", 401)); // 401 unauthorized
 	}
-	// 4. Check Password (veryify it matches the encrypted password; need create a model method to match password inside the User model);
-	const isMatch = await user.matchPassword(password); // this is a promise, coming from the matchPassword() method in User.js
+	// 4. Check if Password Matches(the encrypted password; need create a model method to match password inside the User model);
+	const isMatch = await user.matchPassword(password); // this returns a promise, coming from the matchPassword() method in User.js
 	if (!isMatch) {
 		// if the password is correct, it will proceed to creating a token
 		return next(new ErrorResponse("Invalid User Credientials", 401)); // must match if !user so user can't tell which isn't matched, the email or password
 	}
-	// 5. Create TOKEN
-	const token = user.getSignedJwtToken();
-	res.status(200).json({success: true, token: token});
-	// 6. REMEMBER TO BRING IN & CREATE THE ROUTE! (inside auth.js route)
+	sendTokenResponse(user, 200, res);
 });
+
+// 5(updated)Get token from model, Create cookie and send with Response (replace other code.)
+const sendTokenResponse = (user, statusCode, res) => {
+	// copy paste Create Token from login and register
+	const token = user.getSignedJwtToken(); // Creates token
+	// create cookie:
+	const options = {
+		expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000), // 30 * 24 * 60 * 60 * 1000 to get days...?
+		httpOnly: true
+	};
+
+	res
+		.status(statusCode)
+		.cookie("token", token, options) // key, the value, and the options
+		.json({
+			success: true,
+			token
+		});
+};
 
 /* for the protected routes, instead of just pulling it from the local storage, I will send a cookie to the client with the token inside it.
 - to do this, will create a helper function that will create the token as well as adding the functionality of sending a cookie with the token in it.
 		-- will also have a logout route that will clear the cookie. 
+	https://www.npmjs.com/package/cookie-parser
+	----------
+
+ 5. Create TOKEN was Replaced with sendTokenResponse helper function)
+	// const token = user.getSignedJwtToken();
+	// res.status(200).json({success: true, token: token});
 */

@@ -3,6 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv"); // see config file
 const morgan = require("morgan"); // for middleware
 const fileupload = require("express-fileupload"); // for images
+const cookieParser = require("cookie-parser"); // for storing cookies in local storage and header
 const colors = require("colors");
 const errorHandler = require("./middleware/error");
 const connectDB = require("./config/db"); // this MUST be called after the config, before the routes
@@ -21,8 +22,11 @@ const auth = require("./routes/auth");
 // initilize express
 const app = express();
 
-// Implement the Body Parser (otherwise my data is coming back undefined)
+// Implement Body Parser (otherwise my data is coming back undefined)
 app.use(express.json());
+
+// Cookie-Parser
+app.use(cookieParser());
 
 // Dev Logging MIDDLEWARE
 if (process.env.NODE_ENV === "development") {
